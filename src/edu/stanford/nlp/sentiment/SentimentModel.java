@@ -1,5 +1,6 @@
 package edu.stanford.nlp.sentiment; 
 import edu.stanford.nlp.util.logging.Redwood;
+import net.jafama.FastMath;
 
 import java.io.Serializable;
 import java.io.IOException;
@@ -419,7 +420,7 @@ public class SentimentModel implements Serializable  {
   }
 
   SimpleMatrix randomTransformBlock() {
-    double range = 1.0 / (Math.sqrt((double) numHid) * 2.0);
+    double range = 1.0 / (FastMath.sqrt((double) numHid) * 2.0);
     return SimpleMatrix.random(numHid,numHid,-range,range,rand).plus(identity);
   }
 
@@ -428,7 +429,7 @@ public class SentimentModel implements Serializable  {
    */
   SimpleMatrix randomClassificationMatrix() {
     SimpleMatrix score = new SimpleMatrix(numClasses, numHid + 1);
-    double range = 1.0 / (Math.sqrt((double) numHid));
+    double range = 1.0 / (FastMath.sqrt((double) numHid));
     score.insertIntoThis(0, 0, SimpleMatrix.random(numClasses, numHid, -range, range, rand));
     // bias column goes from 0 to 1 initially
     score.insertIntoThis(0, numHid, SimpleMatrix.random(numClasses, 1, 0.0, 1.0, rand));

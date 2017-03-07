@@ -1,6 +1,6 @@
 package edu.stanford.nlp.ie.crf; 
 import edu.stanford.nlp.util.logging.Redwood;
-
+import net.jafama.FastMath;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Index;
@@ -176,7 +176,7 @@ public class FloatFactorTable  {
 
 
   public float prob(int[] label) {
-    return (float) Math.exp(unnormalizedLogProb(label) - totalMass());
+    return (float) FastMath.exp(unnormalizedLogProb(label) - totalMass());
   }
 
   // given is at the begining, of is at the end
@@ -374,8 +374,8 @@ public class FloatFactorTable  {
         int[] b = new int[]{i, j};
         float t = 0;
         for (int k = 0; k < 6; k++) {
-          t += Math.exp(ft.conditionalLogProb(b, k));
-          log.info(k + "|" + i + "," + j + " : " + Math.exp(ft.conditionalLogProb(b, k)));
+          t += FastMath.exp(ft.conditionalLogProb(b, k));
+          log.info(k + "|" + i + "," + j + " : " + FastMath.exp(ft.conditionalLogProb(b, k)));
         }
         System.out.println(t);
       }

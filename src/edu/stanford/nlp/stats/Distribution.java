@@ -1,5 +1,6 @@
 package edu.stanford.nlp.stats; 
 import edu.stanford.nlp.util.logging.Redwood;
+import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -206,7 +207,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E>  
     // shift all by max so as to minimize the possibility of underflow
     double max = Counters.max(counter); // Thang 17Feb12: max should operate on counter instead of c, fixed!
     for (E key : counter.keySet()) {
-      double count = Math.exp(counter.getCount(key) - max);
+      double count = FastMath.exp(counter.getCount(key) - max);
       c.setCount(key, count);
     }
     return getDistribution(c);
@@ -646,7 +647,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E>  
     double expSum = 0.0;
     int numKeys = 0;
     for (E key : cntr.keySet()) {
-      expSum += Math.exp(cntr.getCount(key));
+      expSum += FastMath.exp(cntr.getCount(key));
       numKeys++;
     }
     Distribution<E> probs = new Distribution<>();
@@ -654,7 +655,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E>  
     probs.reservedMass = 0.0;
     probs.numberOfKeys = numKeys;
     for (E key : cntr.keySet()) {
-      probs.counter.setCount(key, Math.exp(cntr.getCount(key)) / expSum);
+      probs.counter.setCount(key, FastMath.exp(cntr.getCount(key)) / expSum);
     }
     return probs;
   }
@@ -703,7 +704,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E>  
    */
   public double logProbabilityOf(E key) {
     double prob = probabilityOf(key);
-    return Math.log(prob);
+    return FastMath.log(prob);
   }
 
   public E argmax() {

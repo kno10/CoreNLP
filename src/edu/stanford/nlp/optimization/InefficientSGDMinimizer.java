@@ -1,6 +1,7 @@
 package edu.stanford.nlp.optimization;
 
 import edu.stanford.nlp.util.Pair;
+import net.jafama.FastMath;
 
 /**
  * Stochastic Gradient Descent Minimizer.
@@ -138,7 +139,7 @@ public class InefficientSGDMinimizer<T extends Function> extends StochasticMinim
         for (int i = 0; i < dim; i++) {
           val += x[i] * x[i] * var[i];
         }
-        return Math.pow(val * 0.5, pow);
+        return FastMath.pow(val * 0.5, pow);
       }
 
       @Override

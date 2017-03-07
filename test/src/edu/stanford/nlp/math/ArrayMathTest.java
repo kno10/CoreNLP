@@ -60,63 +60,63 @@ public class ArrayMathTest extends TestCase {
   public void testAddInPlace() {
     ArrayMath.addInPlace(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(d1[i]==d2[i]+3);
+      assertEquals(d2[i]+3, d1[i], 0.0);
     }
   }
 
   public void testMultiplyInPlace() {
     ArrayMath.multiplyInPlace(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(d1[i]==d2[i]*3);
+      assertEquals(d2[i]*3, d1[i], 0.0);
     }
   }
 
   public void testPowInPlace() {
     ArrayMath.powInPlace(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(d1[i]==Math.pow(d2[i],3));
+      assertEquals(Math.pow(d2[i],3), d1[i], 1e-7 /* 1e7 scale * 1e-17 accuracy */);
     }
   }
 
   public void testAdd() {
     double[] d1prime = ArrayMath.add(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1prime); i++) {
-      assertTrue(d1prime[i]==d1[i]+3);
+      assertEquals(d1[i]+3, d1prime[i], 0.0);
     }
   }
 
   public void testMultiply() {
     double[] d1prime = ArrayMath.multiply(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1prime); i++) {
-      assertTrue(d1prime[i]==d1[i]*3);
+      assertEquals(d1[i]*3, d1prime[i], 0.0);
     }
   }
 
   public void testPow() {
     double[] d1prime = ArrayMath.pow(d1, 3);
     for (int i = 0; i < ArrayMath.numRows(d1prime); i++) {
-      assertTrue(d1prime[i]==Math.pow(d1[i],3));
+      assertEquals(Math.pow(d1[i],3), d1prime[i], 1e-7 /* 1e7 scale * 1e-17 accuracy */);
     }
   }
 
   public void testPairwiseAdd() {
     double[] sum = ArrayMath.pairwiseAdd(d1,d2);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(sum[i] == d1[i]+d2[i]);
+      assertEquals(d1[i]+d2[i], sum[i], 0.0);
     }
   }
 
   public void testPairwiseSubtract() {
     double[] diff = ArrayMath.pairwiseSubtract(d1,d2);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(diff[i] == d1[i]-d2[i]);
+      assertEquals(d1[i]-d2[i], diff[i], 0.0);
     }
   }
 
   public void testPairwiseMultiply() {
     double[] product = ArrayMath.pairwiseMultiply(d1,d2);
     for (int i = 0; i < ArrayMath.numRows(d1); i++) {
-      assertTrue(product[i] == d1[i]*d2[i]);
+      assertEquals(d1[i]*d2[i], product[i], 0.0);
     }
   }
 
@@ -133,34 +133,34 @@ public class ArrayMathTest extends TestCase {
   }
 
   public void testCountNaN() {
-    assertTrue(ArrayMath.countNaN(d1)==0);
-    assertTrue(ArrayMath.countNaN(d2)==0);
-    assertTrue(ArrayMath.countNaN(d3)==1);
+    assertEquals(0, ArrayMath.countNaN(d1), 0.0);
+    assertEquals(0, ArrayMath.countNaN(d2), 0.0);
+    assertEquals(1, ArrayMath.countNaN(d3), 0.0);
   }
 
   public void testFliterNaN() {
     double[] f_d3 = ArrayMath.filterNaN(d3);
-    assertTrue(ArrayMath.numRows(f_d3)==2);
-    assertTrue(ArrayMath.countNaN(f_d3)==0);
+    assertEquals(2, ArrayMath.numRows(f_d3), 0.0);
+    assertEquals(0, ArrayMath.countNaN(f_d3), 0.0);
   }
 
   public void testCountInfinite() {
-    assertTrue(ArrayMath.countInfinite(d1)==0);
-    assertTrue(ArrayMath.countInfinite(d2)==0);
-    assertTrue(ArrayMath.countInfinite(d3)==1);
+    assertEquals(0, ArrayMath.countInfinite(d1), 0.0);
+    assertEquals(0, ArrayMath.countInfinite(d2), 0.0);
+    assertEquals(1, ArrayMath.countInfinite(d3), 0.0);
   }
 
   public void testFliterInfinite() {
     double[] f_d3 = ArrayMath.filterInfinite(d3);
-    assertTrue(ArrayMath.numRows(f_d3)==2);
-    assertTrue(ArrayMath.countInfinite(f_d3)==0);
+    assertEquals(2, ArrayMath.numRows(f_d3), 0.0);
+    assertEquals(0, ArrayMath.countInfinite(f_d3), 0.0);
   }
 
   public void testFliterNaNAndInfinite() {
     double[] f_d3 = ArrayMath.filterNaNAndInfinite(d3);
-    assertTrue(ArrayMath.numRows(f_d3)==1);
-    assertTrue(ArrayMath.countInfinite(f_d3)==0);
-    assertTrue(ArrayMath.countNaN(f_d3)==0);
+    assertEquals(1, ArrayMath.numRows(f_d3), 0.0);
+    assertEquals(0, ArrayMath.countInfinite(f_d3), 0.0);
+    assertEquals(0, ArrayMath.countNaN(f_d3), 0.0);
   }
 
   public void testSum() {
@@ -169,31 +169,31 @@ public class ArrayMathTest extends TestCase {
     for (double d : d1) {
       mySum += d;
     }
-    assertTrue(sum==mySum);
+    assertEquals(mySum, sum, 0.0);
   }
 
   public void testNorm_inf() {
     double ninf = ArrayMath.norm_inf(d1);
     double max = ArrayMath.max(d1);
-    assertTrue(ninf==max);
+    assertEquals(max, ninf, 0.0);
     ninf = ArrayMath.norm_inf(d2);
     max = ArrayMath.max(d2);
-    assertTrue(ninf==max);
+    assertEquals(max, ninf, 0.0);
     ninf = ArrayMath.norm_inf(d3);
     max = ArrayMath.max(d3);
-    assertTrue(ninf==max);
+    assertEquals(max, ninf, 0.0);
   }
 
   public void testArgmax() {
-    assertTrue(ArrayMath.max(d1)==d1[ArrayMath.argmax(d1)]);
-    assertTrue(ArrayMath.max(d2)==d2[ArrayMath.argmax(d2)]);
-    assertTrue(ArrayMath.max(d3)==d3[ArrayMath.argmax(d3)]);
+    assertEquals(d1[ArrayMath.argmax(d1)], ArrayMath.max(d1), 0.0);
+    assertEquals(d2[ArrayMath.argmax(d2)], ArrayMath.max(d2), 0.0);
+    assertEquals(d3[ArrayMath.argmax(d3)], ArrayMath.max(d3), 0.0);
   }
 
   public void testArgmin() {
-    assertTrue(ArrayMath.min(d1)==d1[ArrayMath.argmin(d1)]);
-    assertTrue(ArrayMath.min(d2)==d2[ArrayMath.argmin(d2)]);
-    assertTrue(ArrayMath.min(d3)==d3[ArrayMath.argmin(d3)]);
+    assertEquals(d1[ArrayMath.argmin(d1)], ArrayMath.min(d1), 0.0);
+    assertEquals(d2[ArrayMath.argmin(d2)], ArrayMath.min(d2), 0.0);
+    assertEquals(d3[ArrayMath.argmin(d3)], ArrayMath.min(d3), 0.0);
   }
 
   public void testLogSum() {
@@ -203,7 +203,7 @@ public class ArrayMathTest extends TestCase {
       myLsum += Math.exp(d);
     }
     myLsum = Math.log(myLsum);
-    assertTrue(myLsum == lsum);
+    assertEquals(lsum, myLsum, 1e-15);
   }
 
   public void testNormalize() {
@@ -220,19 +220,19 @@ public class ArrayMathTest extends TestCase {
 
   public void testKLDivergence() {
     double kld = ArrayMath.klDivergence(d1, d2);
-    assertTrue(kld==0);
+    assertEquals(0, kld, 0.0);
   }
 
   public void testSumAndMean() {
-    assertTrue(ArrayMath.sum(d1) == ArrayMath.mean(d1)*d1.length);
-    assertTrue(ArrayMath.sum(d2) == ArrayMath.mean(d2)*d2.length);
-    //assertTrue(ArrayMath.sum(d3) == ArrayMath.mean(d3)*d3.length);
-    assertTrue(ArrayMath.sum(d4) == ArrayMath.mean(d4)*d4.length);
+    assertEquals(ArrayMath.mean(d1)*d1.length, ArrayMath.sum(d1), 0.0);
+    assertEquals(ArrayMath.mean(d2)*d2.length, ArrayMath.sum(d2), 0.0);
+    //assertEquals(ArrayMath.mean(d3)*d3.length, ArrayMath.sum(d3), 0.0);
+    assertEquals(ArrayMath.mean(d4)*d4.length, ArrayMath.sum(d4), 0.0);
   }
 
   public static void helpTestSafeSumAndMean(double[] d) {
     double[] dprime = ArrayMath.filterNaNAndInfinite(d);
-    assertTrue(ArrayMath.safeMean(d)*ArrayMath.numRows(dprime)==ArrayMath.sum(dprime));
+    assertEquals(ArrayMath.sum(dprime), ArrayMath.safeMean(d)*ArrayMath.numRows(dprime), 0.0);
   }
 
   public void testSafeSumAndMean() {

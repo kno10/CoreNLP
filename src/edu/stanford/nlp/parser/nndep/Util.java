@@ -1,7 +1,7 @@
 
 package edu.stanford.nlp.parser.nndep;
 import edu.stanford.nlp.util.logging.Redwood;
-
+import net.jafama.FastMath;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -46,7 +46,7 @@ public class Util  {
         std += aA[j] * aA[j];
       }
     mean = mean / count;
-    std = Math.sqrt(std / count - mean * mean);
+    std = FastMath.sqrt(std / count - mean * mean);
 
     System.err.printf("Scaling word embeddings:");
     System.err.printf("(mean = %.2f, std = %.2f) -> (mean = %.2f, std = %.2f)", mean, std, rMean, rStd);

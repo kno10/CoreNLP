@@ -14,6 +14,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.util.CallbackFunction;
 import edu.stanford.nlp.util.logging.Redwood;
+import net.jafama.FastMath;
 
 
 /**
@@ -1577,7 +1578,7 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators  {
           + newPt[g];
       s = Math.max(Math.max(theta, newPt[g]), bestPt[g]);
       gamma = s
-          * Math.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
+          * FastMath.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
               * (newPt[g] / s));
       if (newPt[a] < bestPt[a]) {
         gamma = -gamma;
@@ -1614,7 +1615,7 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators  {
           + newPt[g];
       s = Math.max(Math.max(theta, bestPt[g]), newPt[g]);
       gamma = s
-          * Math.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
+          * FastMath.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
               * (newPt[g] / s));
       if (newPt[a] > bestPt[a]) {
         gamma = -gamma;
@@ -1649,7 +1650,7 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators  {
           + newPt[g];
       s = Math.max(Math.max(theta, bestPt[g]), newPt[g]);
       gamma = s
-          * Math.sqrt(Math.max(0.0, (theta / s) * (theta / s) - (bestPt[g] / s)
+          * FastMath.sqrt(Math.max(0.0, (theta / s) * (theta / s) - (bestPt[g] / s)
               * (newPt[g] / s)));
       if (newPt[a] < bestPt[a]) {
         gamma = -gamma;
@@ -1696,7 +1697,7 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators  {
             + newPt[g];
         s = Math.max(Math.max(theta, bestPt[g]), newPt[g]);
         gamma = s
-            * Math.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
+            * FastMath.sqrt((theta / s) * (theta / s) - (bestPt[g] / s)
                 * (newPt[g] / s));
         if (newPt[a] > bestPt[a]) {
           gamma = -gamma;
