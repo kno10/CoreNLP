@@ -37,8 +37,7 @@ public class Dictionary  {
 
   void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
     for (String word : wordTagCounts.keySet()) {
-      TagCount count = new TagCount(wordTagCounts.get(word));
-      dict.put(word, count);
+      dict.put(word, new TagCount(wordTagCounts.get(word)));
     }
   }
 
@@ -77,65 +76,47 @@ public class Dictionary  {
 
   protected void addVThatTaking(String verb) {
     int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      this.partTakingVerbs.get(i).incThat();
+    CountWrapper wrap = this.partTakingVerbs.get(i);
+    if (wrap != null) {
+      wrap.incThat();
     } else {
       this.partTakingVerbs.put(i, new CountWrapper(verb, 0, 1, 0, 0));
     }
   }
 
   protected int getCountPart(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountPart();
-    }
-    return 0;
+    CountWrapper wrap = partTakingVerbs.get(verb.hashCode());
+    return wrap != null ? wrap.getCountPart() : 0;
   }
 
 
   protected int getCountThat(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountThat();
-    }
-    return 0;
+    CountWrapper wrap = partTakingVerbs.get(verb.hashCode());
+    return wrap != null ? wrap.getCountThat() : 0;
   }
 
 
   protected int getCountIn(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountIn();
-    }
-    return 0;
+    CountWrapper wrap = partTakingVerbs.get(verb.hashCode());
+    return wrap != null ? wrap.getCountIn() : 0;
   }
 
 
   protected int getCountRB(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountRB();
-    }
-    return 0;
+    CountWrapper wrap = partTakingVerbs.get(verb.hashCode());
+    return wrap != null ? wrap.getCountRB() : 0;
   }
 
 
   protected int getCount(String word, String tag) {
     TagCount count = dict.get(word);
-    if (count == null) {
-      return 0;
-    } else {
-      return count.get(tag);
-    }
+    return count != null ? count.get(tag) : 0;
   }
 
 
   protected String[] getTags(String word) {
-    TagCount count = get(word);
-    if (count == null) {
-      return null;
-    }
-    return count.getTags();
+    TagCount count = dict.get(word);
+    return count != null ? count.getTags() : null;
   }
 
 
@@ -146,19 +127,13 @@ public class Dictionary  {
 
   String getFirstTag(String word) {
     TagCount count = dict.get(word);
-    if (count != null) {
-      return count.getFirstTag();
-    }
-    return null;
+    return count != null ? count.getFirstTag() : null;
   }
 
 
   protected int sum(String word) {
     TagCount count = dict.get(word);
-    if (count != null) {
-      return count.sum();
-    }
-    return 0;
+    return count != null ? count.sum() : 0;
   }
 
   boolean isUnknown(String word) {

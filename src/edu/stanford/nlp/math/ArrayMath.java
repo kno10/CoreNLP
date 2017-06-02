@@ -1001,21 +1001,15 @@ public class ArrayMath {
         max = logInputs[i];
       }
     }
-    boolean haveTerms = false;
     double intermediate = 0.0;
     double cutoff = max - SloppyMath.LOGTOLERANCE;
     // we avoid rearranging the array and so test indices each time!
     for (int i = fromIndex; i < toIndex; i++) {
       if (i != maxIdx && logInputs[i] > cutoff) {
-        haveTerms = true;
         intermediate += Math.exp(logInputs[i] - max);
       }
     }
-    if (haveTerms) {
-      return max + Math.log(1.0 + intermediate);
-    } else {
-      return max;
-    }
+    return intermediate != 0 ? (max + Math.log(1 + intermediate)) : max;
   }
 
   /**

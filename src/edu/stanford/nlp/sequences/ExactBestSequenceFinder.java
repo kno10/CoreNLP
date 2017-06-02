@@ -188,19 +188,23 @@ public class ExactBestSequenceFinder implements BestSequenceFinder  {
       if (Thread.interrupted()) {  // Allow interrupting
         throw new RuntimeInterruptedException();
       }
-      if (DEBUG) { log.info("scoring word " + pos + " / " + (leftWindow + length) + ", productSizes =  " + productSizes[pos] + ", tagNum = " + tagNum[pos] + "..."); }
-      windowScore[pos] = new double[productSizes[pos]];
+      // Local constants, to avoid repeated array access.
+      final int tagNum_pos = tagNum[pos];
+      final int productSizes_pos = productSizes[pos];
+      final double[] windowScore_pos = windowScore[pos] = new double[productSizes_pos];
+      if (DEBUG) { log.info("scoring word " + pos + " / " + (leftWindow + length) + ", productSizes =  " + productSizes_pos + ", tagNum = " + tagNum_pos + "..."); }
       Arrays.fill(tempTags, tags[0][0]);
-      if (DEBUG) { log.info("windowScore[" + pos + "] has size (productSizes[pos]) " + windowScore[pos].length); }
+      if (DEBUG) { log.info("windowScore[" + pos + "] has size (productSizes[pos]) " + windowScore_pos.length); }
 
-      for (int product = 0; product < productSizes[pos]; product++) {
+      for (int product = 0; product < productSizes_pos; product++) {
         int p = product;
         int shift = 1;
-        for (int curPos = pos + rightWindow; curPos >= pos - leftWindow; curPos--) {
-          tempTags[curPos] = tags[curPos][p % tagNum[curPos]];
-          p /= tagNum[curPos];
+        for (int curPos = pos + rightWindow, endCurPos = pos - leftWindow; curPos >= endCurPos; curPos--) {
+          final int tn = tagNum[curPos];
+          tempTags[curPos] = tags[curPos][p % tn];
+          p /= tn;
           if (curPos > pos) {
-            shift *= tagNum[curPos];
+            shift *= tn;
           }
         }
 
@@ -211,13 +215,13 @@ public class ExactBestSequenceFinder implements BestSequenceFinder  {
           double[] scores = ts.scoresOf(tempTags, pos);
           if (DEBUG) {
             log.info("Matched at array index [product] " + product + "; tempTags[pos] == tags[pos][0] == " + tempTags[pos]);
-            log.info("For pos " + pos + " scores.length is " + scores.length + "; tagNum[pos] = " + tagNum[pos] + "; windowScore[pos].length = " + windowScore[pos].length);
+            log.info("For pos " + pos + " scores.length is " + scores.length + "; tagNum[pos] = " + tagNum_pos + "; windowScore[pos].length = " + windowScore_pos.length);
             log.info("scores: " + Arrays.toString(scores));
           }
           // fill in the relevant windowScores
-          for (int t = 0; t < tagNum[pos]; t++) {
+          for (int t = 0; t < tagNum_pos; t++) {
             if (DEBUG) { log.info("Setting value of windowScore[" + pos + "][" + product + "+" + t + "*" + shift + "] = " + scores[t]); }
-            windowScore[pos][product + t * shift] = scores[t];
+            windowScore_pos[product + t * shift] = scores[t];
           }
         }
       }
