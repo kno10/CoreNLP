@@ -738,8 +738,7 @@ public class TestSentence implements SequenceModel  {
 
     String[] arr1 = maxentTagger.dict.getTags(sent.get(pos));
     if (arr1 == null) {
-      Set<String> open = maxentTagger.tags.getOpenTags(); // todo: really want array of String or int here
-      arr1 = open.toArray(new String[open.size()]);
+      return maxentTagger.tags.openTagsArray();
     }
     return maxentTagger.tags.deterministicallyExpandTags(arr1);
   }
