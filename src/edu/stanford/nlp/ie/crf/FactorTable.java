@@ -49,59 +49,54 @@ public class FactorTable  {
   }
 
   public String toProbString() {
-    StringBuilder sb = new StringBuilder("{\n");
+    StringBuilder sb = new StringBuilder(1000).append("{\n");
     for (int i = 0; i < table.length; i++) {
-      sb.append(Arrays.toString(toArray(i)));
-      sb.append(": ");
-      sb.append(prob(toArray(i)));
-      sb.append('\n');
+      sb.append(Arrays.toString(toArray(i)))
+        .append(": ")
+        .append(prob(toArray(i)))
+        .append('\n');
     }
-    sb.append('}');
-    return sb.toString();
+    return sb.append('}').toString();
   }
 
   public String toNonLogString() {
-    StringBuilder sb = new StringBuilder("{\n");
+    StringBuilder sb = new StringBuilder(1000).append("{\n");
     for (int i = 0; i < table.length; i++) {
-      sb.append(Arrays.toString(toArray(i)));
-      sb.append(": ");
-      sb.append(Math.exp(getValue(i)));
-      sb.append('\n');
+      sb.append(Arrays.toString(toArray(i)))
+        .append(": ")
+        .append(Math.exp(getValue(i)))
+        .append('\n');
     }
-    sb.append('}');
-    return sb.toString();
+    return sb.append('}').toString();
   }
 
   public <L> String toString(Index<L> classIndex) {
-    StringBuilder sb = new StringBuilder("{\n");
+    StringBuilder sb = new StringBuilder(1000).append("{\n");
     for (int i = 0; i < table.length; i++) {
-      sb.append(toString(toArray(i), classIndex));
-      sb.append(": ");
-      sb.append(getValue(i));
-      sb.append('\n');
+      sb.append(toString(toArray(i), classIndex))
+        .append(": ")
+        .append(getValue(i))
+        .append('\n');
     }
-    sb.append('}');
-    return sb.toString();
+    return sb.append('}').toString();
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("{\n");
+    StringBuilder sb = new StringBuilder(1000).append("{\n");
     for (int i = 0; i < table.length; i++) {
-      sb.append(Arrays.toString(toArray(i)));
-      sb.append(": ");
-      sb.append(getValue(i));
-      sb.append('\n');
+      sb.append(Arrays.toString(toArray(i)))
+        .append(": ")
+        .append(getValue(i))
+        .append('\n');
     }
-    sb.append('}');
-    return sb.toString();
+    return sb.append('}').toString();
   }
 
   private static <L> String toString(int[] array, Index<L> classIndex) {
     List<L> l = new ArrayList<>(array.length);
-    for (int item : array) {
+    for (int item : array)
       l.add(classIndex.get(item));
-    }
     return l.toString();
   }
 
@@ -127,45 +122,53 @@ public class FactorTable  {
   */
   private int indexOf(int[] entry) {
     int index = 0;
-    for (int item : entry) {
-      index *= numClasses;
-      index += item;
-    }
+    for (int item : entry)
+      index = index * numClasses + item;
     // if (index < 0) throw new RuntimeException("index=" + index + " entry=" + Arrays.toString(entry)); // only if overflow
     return index;
   }
 
   private int indexOf(int[] front, int end) {
     int index = 0;
-    for (int item : front) {
-      index *= numClasses;
-      index += item;
-    }
-    index *= numClasses;
-    index += end;
-    return index;
+    for (int item : front)
+      index = index * numClasses + item;
+    return index * numClasses + end;
   }
 
   private int indexOf(int front, int[] end) {
     int index = front;
-    for (int item : end) {
-      index *= numClasses;
-      index += item;
-    }
+    for (int item : end)
+      index = index * numClasses + item;
     return index;
+  }
+
+  private int indexOf(int front, int[] end, int cutoff) {
+	int index = front;
+	for (int i = 0; i < cutoff; i++)
+	  index = index * numClasses + end[i];
+	return index;
   }
 
   private int[] indicesEnd(int[] entries) {
     int index = 0;
-    for (int entry : entries) {
-      index *= numClasses;
-      index += entry;
-    }
+    for (int entry : entries)
+      index = index * numClasses + entry;
     int[] indices = new int[SloppyMath.intPow(numClasses, windowSize - entries.length)];
     final int offset = SloppyMath.intPow(numClasses, entries.length);
     for (int i = 0; i < indices.length; i++) {
       indices[i] = index;
       index += offset;
+    }
+    // log.info("indicesEnd returning: " + Arrays.toString(indices));
+    return indices;
+  }
+
+  private int[] indicesEnd(int entry) {
+    int index = entry;
+    int[] indices = new int[SloppyMath.intPow(numClasses, windowSize - 1)];
+    for (int i = 0; i < indices.length; i++) {
+      indices[i] = index;
+      index += numClasses;
     }
     // log.info("indicesEnd returning: " + Arrays.toString(indices));
     return indices;
@@ -181,12 +184,9 @@ public class FactorTable  {
    */
   private int indicesFront(int[] entries) {
     int start = 0;
-    for (int entry : entries) {
-      start *= numClasses;
-      start += entry;
-    }
-    int offset = SloppyMath.intPow(numClasses, windowSize - entries.length);
-    return start * offset;
+    for (int entry : entries)
+      start = start * numClasses + entry;
+    return start * SloppyMath.intPow(numClasses, windowSize - entries.length);
   }
 
   public int windowSize() {
@@ -208,6 +208,11 @@ public class FactorTable  {
   /** Returns a single clique potential. */
   public double unnormalizedLogProb(int[] label) {
     return getValue(label);
+  }
+
+  /** Returns a single clique potential. */
+  public double unnormalizedLogProb(int front, int[] end, int cutoff) {
+    return table[indexOf(front, end, cutoff)];
   }
 
   public double logProb(int[] label) {
@@ -280,10 +285,8 @@ public class FactorTable  {
           windowSize + ") but was " + Arrays.toString(given));
     }
     double[] result = new double[numClasses];
-    for (int i = 0; i < numClasses; i++) {
-      int index = indexOf(given, i);
-      result[i] = table[index];
-    }
+    for (int i = 0; i < numClasses; i++)
+      result[i] = table[indexOf(given, i)];
     ArrayMath.logNormalize(result);
     return result;
   }
@@ -301,11 +304,8 @@ public class FactorTable  {
           windowSize + ") but was " + Arrays.toString(of));
     }
     // compute P(given, of)
-    int[] labels = new int[windowSize];
-    labels[0] = given;
-    System.arraycopy(of, 0, labels, 1, windowSize - 1);
     // double probAll = logProb(labels);
-    double probAll = unnormalizedLogProb(labels);
+    double probAll = unnormalizedLogProb(given, of, windowSize - 1);
 
     // compute P(given)
     // double probGiven = logProbFront(given);
@@ -328,11 +328,8 @@ public class FactorTable  {
               windowSize + ") but was " + Arrays.toString(of));
     }
     // compute P(given, of)
-    int[] labels = new int[windowSize];
-    labels[0] = given;
-    System.arraycopy(of, 0, labels, 1, windowSize - 1);
     // double probAll = logProb(labels);
-    double probAll = unnormalizedLogProb(labels);
+    double probAll = unnormalizedLogProb(given, of, windowSize - 1);
 
     // compute P(given)
     // double probGiven = logProbFront(given);
@@ -357,12 +354,9 @@ public class FactorTable  {
     }
     int[] label = indicesEnd(given);
     double[] masses = new double[label.length];
-    for (int i = 0; i < masses.length; i++) {
+    for (int i = 0; i < masses.length; i++)
       masses[i] = table[label[i]];
-    }
-    double z = ArrayMath.logSum(masses);
-
-    return table[indexOf(of, given)] - z;
+    return table[indexOf(of, given)] - ArrayMath.logSum(masses);
   }
 
   public double unnormalizedLogProbFront(int[] labels) {
@@ -380,8 +374,13 @@ public class FactorTable  {
   }
 
   public double unnormalizedLogProbFront(int label) {
-    int[] labels = { label };
-    return unnormalizedLogProbFront(labels);
+    int numCellsToSum = SloppyMath.intPow(numClasses, windowSize - 1);
+    int startIndex = label * numCellsToSum;
+    // double[] masses = new double[labels.length];
+    // for (int i = 0; i < masses.length; i++) {
+    //   masses[i] = table[labels[i]];
+    // }
+    return ArrayMath.logSum(table, startIndex, startIndex + numCellsToSum);
   }
 
   public double logProbFront(int label) {
@@ -391,9 +390,8 @@ public class FactorTable  {
   public double unnormalizedLogProbEnd(int[] labels) {
     labels = indicesEnd(labels);
     double[] masses = new double[labels.length];
-    for (int i = 0; i < masses.length; i++) {
+    for (int i = 0; i < masses.length; i++)
       masses[i] = table[labels[i]];
-    }
     return ArrayMath.logSum(masses);
   }
 
@@ -402,8 +400,11 @@ public class FactorTable  {
   }
 
   public double unnormalizedLogProbEnd(int label) {
-    int[] labels = { label };
-    return unnormalizedLogProbEnd(labels);
+    int[] labels = indicesEnd(label);
+    double[] masses = new double[labels.length];
+    for (int i = 0; i < masses.length; i++)
+      masses[i] = table[labels[i]];
+    return ArrayMath.logSum(masses);
   }
 
   public double logProbEnd(int label) {
@@ -452,23 +453,20 @@ public class FactorTable  {
 
   public void multiplyInFront(FactorTable other) {
     int divisor = SloppyMath.intPow(numClasses, windowSize - other.windowSize());
-    for (int i = 0; i < table.length; i++) {
+    for (int i = 0; i < table.length; i++)
       table[i] += other.getValue(i / divisor);
-    }
   }
 
   public void multiplyInEnd(FactorTable other) {
     int divisor = SloppyMath.intPow(numClasses, other.windowSize());
-    for (int i = 0; i < table.length; i++) {
+    for (int i = 0; i < table.length; i++)
       table[i] += other.getValue(i % divisor);
-    }
   }
 
   public FactorTable sumOutEnd() {
     FactorTable ft = new FactorTable(numClasses, windowSize - 1);
-    for (int i = 0, sz = ft.size(); i < sz; i++) {
+    for (int i = 0, sz = ft.size(); i < sz; i++)
       ft.table[i] = ArrayMath.logSum(table, i * numClasses, (i+1) * numClasses);
-    }
     /*
     for (int i = 0; i < table.length; i++) {
       ft.logIncrementValue(i / numClasses, table[i]);
@@ -480,9 +478,8 @@ public class FactorTable  {
   public FactorTable sumOutFront() {
     FactorTable ft = new FactorTable(numClasses, windowSize - 1);
     int stride = ft.size();
-    for (int i = 0; i < stride; i++) {
+    for (int i = 0; i < stride; i++)
       ft.setValue(i, ArrayMath.logSum(table, i, table.length, stride));
-    }
     return ft;
   }
 
@@ -520,35 +517,25 @@ public class FactorTable  {
      * System.out.println("##########################################");
      **/
 
-    for (int i = 0; i < numClasses; i++) {
-      for (int j = 0; j < numClasses; j++) {
-        for (int k = 0; k < numClasses; k++) {
-          int[] b = { i, j, k };
-          ft.setValue(b, (i * 4) + (j * 2) + k);
-        }
-      }
-    }
+    for (int i = 0; i < numClasses; i++)
+      for (int j = 0; j < numClasses; j++)
+        for (int k = 0; k < numClasses; k++)
+          ft.setValue(new int[] { i, j, k }, (i * 4) + (j * 2) + k);
 
     log.info(ft);
     double normalization = 0.0;
-    for (int i = 0; i < numClasses; i++) {
-      for (int j = 0; j < numClasses; j++) {
-        for (int k = 0; k < numClasses; k++) {
+    for (int i = 0; i < numClasses; i++)
+      for (int j = 0; j < numClasses; j++)
+        for (int k = 0; k < numClasses; k++)
           normalization += ft.unnormalizedLogProb(new int[] {i, j, k});
-        }
-      }
-    }
     log.info("Normalization Z = " + normalization);
 
     log.info(ft.sumOutFront());
 
     FactorTable ft2 = new FactorTable(numClasses, 2);
-    for (int i = 0; i < numClasses; i++) {
-      for (int j = 0; j < numClasses; j++) {
-        int[] b = { i, j };
-        ft2.setValue(b, i * numClasses + j);
-      }
-    }
+    for (int i = 0; i < numClasses; i++)
+      for (int j = 0; j < numClasses; j++)
+        ft2.setValue(new int[] { i, j }, i * numClasses + j);
 
     log.info(ft2);
     // FactorTable ft3 = ft2.sumOutFront();
@@ -560,8 +547,7 @@ public class FactorTable  {
         double t = 0;
         for (int k = 0; k < numClasses; k++) {
           t += Math.exp(ft.conditionalLogProbGivenPrevious(b, k));
-          System.err
-              .println(k + "|" + i + ',' + j + " : " + Math.exp(ft.conditionalLogProbGivenPrevious(b, k)));
+          System.err.println(k + "|" + i + ',' + j + " : " + Math.exp(ft.conditionalLogProbGivenPrevious(b, k)));
         }
         log.info(t);
       }
@@ -574,8 +560,7 @@ public class FactorTable  {
         double t = 0.0;
         for (int i = 0; i < numClasses; i++) {
           t += ft.unnormalizedConditionalLogProbGivenFirst(i, b);
-          System.err
-              .println(i + "|" + j + ',' + k + " : " + ft.unnormalizedConditionalLogProbGivenFirst(i, b));
+          System.err.println(i + "|" + j + ',' + k + " : " + ft.unnormalizedConditionalLogProbGivenFirst(i, b));
         }
         log.info(t);
       }
@@ -588,8 +573,7 @@ public class FactorTable  {
         double t = 0.0;
         for (int k = 0; k < numClasses; k++) {
           t += ft.conditionalLogProbGivenNext(b, k);
-          System.err
-              .println(i + "," + j + '|' + k + " : " + ft.conditionalLogProbGivenNext(b, k));
+          System.err.println(i + "," + j + '|' + k + " : " + ft.conditionalLogProbGivenNext(b, k));
         }
         log.info(t);
       }
@@ -611,5 +595,4 @@ public class FactorTable  {
     FactorTable ft5 = ft3.sumOutEnd();
     log.info(ft5.toNonLogString());
   } // end main
-
 }
