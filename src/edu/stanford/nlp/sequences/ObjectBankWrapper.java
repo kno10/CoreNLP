@@ -120,6 +120,7 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
 
 
   private void doBasicStuff(List<IN> doc) {
+    
     int position = 0;
     for (IN fl : doc) {
 
@@ -151,7 +152,7 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
       } else {
         fl.set(CoreAnnotations.TextAnnotation.class, intern(fix(fl.get(CoreAnnotations.TextAnnotation.class))));
         // only override GoldAnswer if not set - so that a DocumentReaderAndWriter can set it right in the first place.
-        if (fl.get(CoreAnnotations.AnswerAnnotation.class) == null) {
+        if (fl.get(CoreAnnotations.AnswerAnnotation.class) != null) {
           fl.set(CoreAnnotations.GoldAnswerAnnotation.class, fl.get(CoreAnnotations.AnswerAnnotation.class));
         }
       }
@@ -266,22 +267,27 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
   public void clear() { wrapped.clear(); }
   @Override
   public void clearMemory() { wrapped.clearMemory(); }
-  public boolean contains(List<IN> o) { return wrapped.contains(o); }
+  @Override
+  public boolean contains(Object o) { return wrapped.contains(o); }
   @Override
   public boolean containsAll(Collection<?> c) { return wrapped.containsAll(c); }
   @Override
   public boolean isEmpty() { return wrapped.isEmpty(); }
   @Override
   public void keepInMemory(boolean keep) { wrapped.keepInMemory(keep); }
-  public boolean remove(List<IN> o) { return wrapped.remove(o); }
   @Override
-  public boolean removeAll(Collection<?> c) { return wrapped.removeAll(c); }
+  public boolean remove(Object o) { throw new UnsupportedOperationException("Wrapped ObjectBank does not support removing objects.");  }
   @Override
-  public boolean retainAll(Collection<?> c) { return wrapped.retainAll(c); }
+  public boolean removeAll(Collection<?> c) { throw new UnsupportedOperationException("Wrapped ObjectBank does not support removing objects.");  }
+  @Override
+  public boolean retainAll(Collection<?> c) { throw new UnsupportedOperationException("Wrapped ObjectBank does not support removing objects."); }
   @Override
   public int size() { return wrapped.size(); }
-  @Override
-  public Object[] toArray() { return wrapped.toArray(); }
-  public List<IN>[] toArray(List<IN>[] o) { return wrapped.toArray(o); }
+  
+  // Do not delegate toArray, because this will return non-wrapped objects!
+  // Instead, inherit the iterator() based call.
+  //@Override
+  //public Object[] toArray() { return wrapped.toArray(); }
+  //public List<IN>[] toArray(List<IN>[] o) { return wrapped.toArray(o); }
 
 } // end class ObjectBankWrapper
