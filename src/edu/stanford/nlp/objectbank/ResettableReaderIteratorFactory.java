@@ -79,23 +79,19 @@ public class ResettableReaderIteratorFactory extends ReaderIteratorFactory {
     Collection<Object> newCollection = new ArrayList<>();
     for (Object o : c) {
       if (o instanceof Reader) {
-        String name = o.toString()+".tmp";
-        File tmpFile;
         try {
-          tmpFile = File.createTempFile(name,"");
+          File tmpFile = File.createTempFile(o.toString(),".tmp");
+          tmpFile.deleteOnExit();
+          StringUtils.printToFile(tmpFile, IOUtils.slurpReader((Reader) o),
+              false, false, enc);
+          o = tmpFile;
         } catch (Exception e) {
           throw new RuntimeIOException(e);
         }
-        tmpFile.deleteOnExit();
-        StringUtils.printToFile(tmpFile, IOUtils.slurpReader((Reader) o),
-                                false, false, enc);
-        newCollection.add(tmpFile);
-      } else {
-        newCollection.add(o);
       }
+      newCollection.add(o);
     }
     c = newCollection;
     return new ReaderIterator();
   }
-
 }
